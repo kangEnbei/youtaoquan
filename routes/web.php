@@ -12,5 +12,17 @@
 */
 
 $router->get('/', function () use ($router) {
-    return $router->app->version();
+    echo "";
+    exit;
+});
+
+$router->group(['namespace' => 'Api', 'middleware' => ['CheckSignatureMiddleware', 'DecryptMiddleware', 'EncryptMiddleware'], 'prefix' => 'api'], function () use ($router) {
+
+    $router->get('/', [
+        'as' => 'WechatCallback', 'uses' => 'WechatCallbackController@index'
+    ]);
+    $router->post('/', [
+        'as' => 'WechatCallback', 'uses' => 'WechatCallbackController@index'
+    ]);
+
 });

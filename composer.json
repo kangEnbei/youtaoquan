@@ -21,6 +21,7 @@
     },
     "autoload-dev": {
         "classmap": [
+            "extends/WechatCrypto/",
             "tests/",
             "database/"
         ]

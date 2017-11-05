@@ -67,6 +67,12 @@ $app->singleton(
 //     'auth' => App\Http\Middleware\Authenticate::class,
 // ]);
 
+$app->routeMiddleware([
+    'CheckSignatureMiddleware' => App\Http\Middleware\CheckSignatureMiddleware::class,
+    'DecryptMiddleware' => App\Http\Middleware\DecryptMiddleware::class,
+    'EncryptMiddleware' => App\Http\Middleware\EncryptMiddleware::class,
+]);
+
 /*
 |--------------------------------------------------------------------------
 | Register Service Providers
