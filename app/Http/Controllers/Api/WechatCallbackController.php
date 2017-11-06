@@ -13,133 +13,135 @@ use Illuminate\Http\Request;
 
 class WechatCallbackController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        //Î¢ÐÅ¹«ÖÚºÅ½Ó¿ÚµÚÒ»´Î½ÓÈë£¬ÑéÖ¤ºóÔ­Ñù·µ»Ø
-        if (isset($_REQUEST['echostr'])) {
-            $this->valid();
-        } else {
+        $resultStr = "";
+        $xmlObj = $request->get('xmlObj', null);
+        if (!is_null($xmlObj)) {
+            //æ¶ˆæ¯ç±»åž‹
+            $RX_TYPE = trim($xmlObj->MsgType);
+            switch ($RX_TYPE) {
+                case "text":
+                    $resultStr = $this->receiveText($xmlObj);
+                    break;
+                case "event":
+                    $resultStr = $this->receiveEvent($xmlObj);
+                    break;
+                default:
+                    $resultStr = "unknow msg type: " . $RX_TYPE;
+                    break;
+            }
         }
-    }
-
-    private function valid(){
-        $signature = $_REQUEST["signature"];
-        $timestamp = $_REQUEST["timestamp"];
-        $nonce = $_REQUEST["nonce"];
-        //¶ÁÈ¡ÁÙÊ±Token
-        $token = config('temp.Token', 'ningjian');
-
-        if ($this->checkSignature($token, $signature, $timestamp, $nonce)) {
-            // ob_clean(); //Á½ÐÐÕæÅ£±Æ
-            // header('content-type:text'); //Á½ÐÐÕæÅ£±Æ
-            echo $_REQUEST["echostr"];
-            exit;
-        }
-    }
-
-    public function index2(Request $request)
-    {
-        $xmlObj = $request->get('xmlObj');
-        //ÏûÏ¢ÀàÐÍ
-        $RX_TYPE = trim($xmlObj->MsgType);
-        switch ($RX_TYPE) {
-            case "text":
-                $resultStr = $this->receiveText($xmlObj);
-                break;
-            case "image":
-                $resultStr = $this->receiveImage($xmlObj);
-                break;
-            case "voice":
-                $resultStr = $this->receiveVoice($xmlObj);
-                break;
-            case "video":
-                $resultStr = $this->receiveVideo($xmlObj);
-                break;
-            case "shortvideo":
-                $resultStr = $this->receiveShortVideo($xmlObj);
-                break;
-            case "location":
-                $resultStr = $this->receiveLocation($xmlObj);
-                break;
-            case "link":
-                $resultStr = $this->receiveLink($xmlObj);
-                break;
-            case "event":
-                $resultStr = $this->receiveEvent($xmlObj);
-                break;
-            default:
-                $resultStr = "unknow msg type: " . $RX_TYPE;
-                break;
-        }
-
-        echo $resultStr;
+        return $resultStr;
     }
 
     /**
-     * ½ÓÊÕÎÄ±¾ÏûÏ¢
+     * æŽ¥æ”¶æ–‡æœ¬æ¶ˆæ¯
      * @param $object
      * @return string
      */
     private function receiveText($object)
     {
-        //ÅÐ¶ÏÏûÏ¢ÊÇ·ñÖØ¸´
-//        if ($this->msgRepeated($object)) {
-//            return "";
-//        }
+        //åˆ¤æ–­æ¶ˆæ¯æ˜¯å¦é‡å¤
+        if ($this->msgRepeated($object)) {
+            return "";
+        }
 
-        //¸ù¾Ý¹Ø¼ü´Ê´ÓRedis
+        //æ ¹æ®å…³é”®è¯ä»ŽRedis
         $fromUserName = $object->FromUserName;
         $content = $object->Content;
-        if (strcasecmp($content, 'openid') == 0) {
-            //·µ»ØÓÃ»§OPENID
-            $contentStr = $fromUserName;
-            $resultStr = $this->transmitText($object, $contentStr);
-        } else {
-            //³ÇÊÐÌìÆø£¬ÏÖÔÚÓÃ²»ÁË£¬½âÎöXMLÌ«ºÄÊ±¡£
-            $tw = new WeatherApiTest();
-            $contentStr = $tw->getWeatherInfo($content);
-            $resultStr = $this->transmitText($object, $contentStr);
-        }
-        //·µ»ØXML×Ö·û´®
+        $resultStr = $this->transmitText($object, "ä½ å¥½");
+        //è¿”å›žXMLå­—ç¬¦ä¸²
         return $resultStr;
     }
 
     /**
-     * ½ÓÊÕÊÂ¼þ£¬¹Ø×¢µÈ
+     * æŽ¥æ”¶äº‹ä»¶ï¼Œå…³æ³¨ç­‰
      * @param $object
      * @return string
      */
     private function receiveEvent($object)
     {
-        //ÅÐ¶ÏÏûÏ¢ÊÇ·ñÖØ¸´
-        if ($this->msgRepeated($object)) {
-            return "";
-        }
+        //åˆ¤æ–­æ¶ˆæ¯æ˜¯å¦é‡å¤
+//        if ($this->msgRepeated($object)) {
+//            return "";
+//        }
 
-        $contentStr = "";
-        switch ($object->Event) {
-            case "subscribe":
-                $title = "ÄãºÃ£¬·¢ËÍ666¼´¿ÉÍæÒ¡Ò¡»ú"; //¹Ø×¢ºó»Ø¸´ÄÚÈÝ
-                $contentStr = $this->transmitText($object, $title);
+//        $contentStr = "";
+//        switch ($object->Event) {
+//            case "subscribe":
+//                $title = "ä½ å¥½ï¼Œå‘é€666å³å¯çŽ©æ‘‡æ‘‡æœº"; //å…³æ³¨åŽå›žå¤å†…å®¹
+//                $contentStr = $this->transmitText($object, $title);
+//                break;
+//            case "unsubscribe":
+//                $contentStr = "å–æ¶ˆæˆåŠŸ";
+//                $this->unsubscribe($object);
+//                break;
+//            case "LOCATION":
+//                $contentStr = $this->receiveClick($object); //ç‚¹å‡»äº‹ä»¶
+//                break;
+//            case "CLICK":
+//                $contentStr = $this->receiveClick($object); //ç‚¹å‡»äº‹ä»¶
+//                break;
+//            case "VIEW":
+//                $contentStr = $this->receiveClick($object); //ç‚¹å‡»äº‹ä»¶
+//                break;
+//            default:
+//                $contentStr = "receive a new event: " . $object->Event;
+//                break;
+//        }
+//        //è¿”å›žXMLå­—ç¬¦ä¸²
+//        return $contentStr;
+    }
+
+    private function transmitText($object, $contentStr)
+    {
+        $textTpl = '<xml>
+        <ToUserName><![CDATA[%s]]></ToUserName>
+        <FromUserName><![CDATA[%s]]></FromUserName>
+        <CreateTime>%s</CreateTime>
+        <MsgType><![CDATA[text]]></MsgType>
+        <Content><![CDATA[%s]]></Content>
+        </xml>';
+
+        $fromUserName = $object->FromUserName;
+        $toUserName = $object->ToUserName;
+        $time = $object->CreateTime;
+        $resultStr = sprintf($textTpl, $fromUserName, $toUserName, $time, $contentStr);
+        return $resultStr;
+    }
+
+    private function msgRepeated($object)
+    {
+        $redis = new \Redis();
+        $redis->connect('127.0.0.1', 6379);
+        //TODO
+        $redis->select(config('redis.dbindex', 2));//é»˜è®¤é€‰æ‹©db2ï¼Œä¸‹æ ‡ä»Ž0å¼€å§‹ï¼Œå¯è¯»å–é…ç½®
+        //é›†åˆæ“ä½œ
+        $RX_TYPE = trim($object->MsgType);
+        switch ($RX_TYPE) {
+            case 'event':
+                //æ·»åŠ å¤±è´¥è¡¨ç¤ºå·²å­˜åœ¨ï¼Œæ‰€ä»¥è¦è¿”å›žtrueä»£è¡¨ä¸å­˜åœ¨
+                if ($redis->sadd($RX_TYPE, strval($object->FromUserName . $object->CreateTime))) {
+                    $FLAG = false;
+                } else {
+                    $FLAG = true;
+                }
                 break;
-            case "unsubscribe":
-                $contentStr = "È¡Ïû³É¹¦";
-                $this->unsubscribe($object);
-                break;
-            case "LOCATION":
-                $contentStr = $this->receiveClick($object); //µã»÷ÊÂ¼þ
-                break;
-            case "CLICK":
-                $contentStr = $this->receiveClick($object); //µã»÷ÊÂ¼þ
-                break;
-            case "VIEW":
-                $contentStr = $this->receiveClick($object); //µã»÷ÊÂ¼þ
-                break;
+
             default:
-                $contentStr = "receive a new event: " . $object->Event;
+                //æ·»åŠ æˆåŠŸè¡¨ç¤ºä¸å­˜åœ¨ï¼Œæ‰€ä»¥è¦è¿”å›žfalseä»£è¡¨ä¸å­˜åœ¨
+                if ($redis->sadd($RX_TYPE, strval($object->MsgId))) {
+                    $FLAG = false;
+                } else {
+                    $FLAG = true;
+                }
                 break;
         }
-        //·µ»ØXML×Ö·û´®
-        return $contentStr;
+        //redisæœ‰æœ€å¤§æ•°é‡é™åˆ¶
+        if ($redis->scard($RX_TYPE) > 102400) {
+            $redis->del($RX_TYPE);
+        }
+        return $FLAG;
     }
 }

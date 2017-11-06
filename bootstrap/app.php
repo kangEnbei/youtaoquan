@@ -48,6 +48,14 @@ $app->singleton(
     App\Console\Kernel::class
 );
 
+//Register Config
+foreach (glob(__DIR__ . '/../config/*.php') as $path) {
+    if ($path) {
+        $pathInfo = pathinfo(basename($path));
+        $app->make('config')->set($pathInfo['filename'], require realpath($path));
+    }
+}
+
 /*
 |--------------------------------------------------------------------------
 | Register Middleware
