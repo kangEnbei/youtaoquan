@@ -138,10 +138,13 @@ class WechatCallbackController extends Controller
                 }
                 break;
         }
-        //redis有最大数量限制
-        if ($redis->scard($RX_TYPE) > 102400) {
+        //60s 判断消息是否重复
+        $redis->expire($RX_TYPE,60);
+        //redis有最大数量限制，这里设为1024*1024=1M
+        if ($redis->scard($RX_TYPE) > 1048576) {
             $redis->del($RX_TYPE);
         }
+        $redis->close();
         return $FLAG;
     }
 }
