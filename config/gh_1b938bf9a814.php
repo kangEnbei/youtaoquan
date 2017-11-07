@@ -6,4 +6,5 @@ return [
     'GrantType' => 'client_credential',
     'ID' => 'gh_1b938bf9a814',//原始ID
     'Token' => 'youtaoquan',
+    'Name' => '有淘券',
 ];
