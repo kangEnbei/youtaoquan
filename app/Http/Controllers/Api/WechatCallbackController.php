@@ -114,9 +114,13 @@ class WechatCallbackController extends Controller
     private function msgRepeated($object)
     {
         $redis = new \Redis();
-        $redis->connect('127.0.0.1', 6379);
-        //TODO
-        $redis->select(config('redis.dbindex', 2));//默认选择db2，下标从0开始，可读取配置
+        if ($redis->connect(config('redis.MsgStatistics.host', '127.0.0.1'), intval(config('redis.MsgStatistics.port', 6379))) === false) {
+            return false;
+        }
+        //默认选择db2，下标从0开始，可读取配置
+        if ($redis->select(intval(config('redis.MsgStatistics.dbindex', 2))) === false) {
+            return false;
+        }
         //集合操作
         $RX_TYPE = trim($object->MsgType);
         switch ($RX_TYPE) {
@@ -139,9 +143,9 @@ class WechatCallbackController extends Controller
                 break;
         }
         //60s 判断消息是否重复
-        $redis->expire($RX_TYPE,60);
+        $redis->expire($RX_TYPE, intval(config('redis.MsgStatistics.expire', 60)));
         //redis有最大数量限制，这里设为1024*1024=1M
-        if ($redis->scard($RX_TYPE) > 1048576) {
+        if ($redis->scard($RX_TYPE) > intval(config('redis.MsgStatistics.chunkSize', 1048576))) {
             $redis->del($RX_TYPE);
         }
         $redis->close();
