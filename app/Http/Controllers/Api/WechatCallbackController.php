@@ -65,9 +65,9 @@ class WechatCallbackController extends Controller
                     $classInfo = (array)(unserialize($redis->hGet('classMap', $object->Content)));
                     if (!empty($classInfo['class']) && !empty($classInfo['method'])) {
                         $redis->close();
-                        $controller = new $classInfo['class']();
-                        //下面这一步不能执行，怎么解决
-                        return $controller->$classInfo['method']($object);
+//                        $controller = new $classInfo['class']();
+//                        //下面这一步不能执行，怎么解决
+//                        return $controller->$classInfo['method']($object);
                         return call_user_func(array($classInfo['class'], $classInfo['method']),$object);
                     }
                     $redis->close();
