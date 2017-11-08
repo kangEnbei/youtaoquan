@@ -17,6 +17,7 @@ class WechatCallbackController extends Controller
     public function index(Request $request)
     {
         $resultStr = "";
+        //不管有没有经过加密，此时的xmlObj都应该是已经被解密过的，可直接识别
         $xmlObj = $request->get('xmlObj', null);
         if (!is_null($xmlObj)) {
             //若classMap过期，则更新Redis
@@ -36,10 +37,11 @@ class WechatCallbackController extends Controller
                     $resultStr = $this->receiveEvent($xmlObj);
                     break;
                 default:
-                    $resultStr = "unknow msg type: " . $RX_TYPE;
+                    $resultStr = "unknow msg type: " . $RX_TYPE;//由于需要返回XML字符串，所以该条信息会在加密中间件被过滤掉
                     break;
             }
         }
+        //返回的是XML字符串
         return $resultStr;
     }
 
@@ -54,7 +56,7 @@ class WechatCallbackController extends Controller
         if ($this->msgRepeated($object)) {
             return "";
         }
-        //初始化通用控制器类
+        //初始化通用控制器类，用来提示用户需要发送哪些关键字
         $controller = new \App\Http\Controllers\Api\CommonUseController();
         //根据关键词从Redis
         $redis = new \Redis();
@@ -71,9 +73,7 @@ class WechatCallbackController extends Controller
                         return call_user_func(array(new $classInfo['class'](), $classInfo['method']),$object);
 //                        return call_user_func(array($classInfo['class'], $classInfo['method']),$object);
                     }
-                    $redis->close();
                 }
-                $redis->close();
             }
             $redis->close();
         }
@@ -114,7 +114,7 @@ class WechatCallbackController extends Controller
                 $contentStr = $this->transmitText($object, $title);
                 break;
             default:
-                $contentStr = "receive a new event: " . $object->Event;
+                $contentStr = "receive a new event: " . $object->Event;//由于需要返回XML字符串，所以该条信息会在加密中间件被过滤掉
                 break;
         }
         //返回XML字符串

@@ -16,11 +16,13 @@ class DecryptMiddleware
     public function handle($request, Closure $next)
     {
         $xmlObj = $request->get('xmlObj', null);
-        if (isset($xmlObj->Encrypt)) {
-            $xmlObj = $this->decrypt($xmlObj);
-            $request->attributes->add(compact('xmlObj'));
-            $IF_ENCRYPT = true;
-            $request->attributes->add(compact('IF_ENCRYPT'));
+        if (!is_null($xmlObj)) {
+            if (isset($xmlObj->Encrypt)) {
+                $xmlObj = $this->decrypt($xmlObj);
+                $request->attributes->add(compact('xmlObj'));
+                $IF_ENCRYPT = true;
+                $request->attributes->add(compact('IF_ENCRYPT'));
+            }
         } else {
             echo "";
             exit;

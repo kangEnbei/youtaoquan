@@ -11,10 +11,10 @@
 |
 */
 
-$router->get('/', function () use ($router) {
-    echo "";
-    exit;
-});
+//$router->get('/', function () use ($router) {
+//    echo "";
+//    exit;
+//});
 
 $router->group(['namespace' => 'Api', 'middleware' => ['CheckSignatureMiddleware', 'DecryptMiddleware', 'EncryptMiddleware'], 'prefix' => 'api'], function () use ($router) {
 
@@ -27,10 +27,20 @@ $router->group(['namespace' => 'Api', 'middleware' => ['CheckSignatureMiddleware
 
 });
 
-$router->group(['namespace' => 'View', 'middleware' => [], 'prefix' => ''], function () use ($router) {
+//此条规则弃用
+//$router->group(['namespace' => 'View', 'middleware' => [], 'prefix' => ''], function () use ($router) {
+//    //匹配view、view/、view/id
+//    //很奇怪这种模式下不能把view写到prefix里
+//    $router->get('view[/{id}]', [
+//        'as' => 'CouponPage', 'uses' => 'CouponPageController@index'
+//    ]);
+//
+//});
+
+$router->group(['namespace' => 'View', 'middleware' => [], 'prefix' => 'view'], function () use ($router) {
     //匹配view、view/、view/id
     //很奇怪这种模式下不能把view写到prefix里
-    $router->get('view[/{id}]', [
+    $router->get('/{id:[0-9]+}', [
         'as' => 'CouponPage', 'uses' => 'CouponPageController@index'
     ]);
 
