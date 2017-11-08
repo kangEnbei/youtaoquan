@@ -68,7 +68,8 @@ class WechatCallbackController extends Controller
 //                        $controller = new $classInfo['class']();
 //                        //下面这一步不能执行，怎么解决
 //                        return $controller->$classInfo['method']($object);
-                        return call_user_func(array($classInfo['class'], $classInfo['method']),$object);
+                        return call_user_func(array(new $classInfo['class'](), $classInfo['method']),$object);
+//                        return call_user_func(array($classInfo['class'], $classInfo['method']),$object);
                     }
                     $redis->close();
                 }

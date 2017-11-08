@@ -18,8 +18,8 @@ class CouponController extends Controller
     {
         //根据ToUserName读表选8条数据组装成XML并返回图文消息
         $tableName = $xmlObj->ToUserName;
-        $column = array('as', 'as', 'as', 'as');
-        $couponArr = DB::connection('mysql')->table('class_map')->select($column)->orderBy('name', 'desc')->get();
+        $column = array('商品名称 as Title', '优惠券面额 as Description', '商品主图 as PicUrl', '淘宝客链接 as Url');
+        $couponArr = DB::connection('mysql')->table($tableName)->select($column)->limit(8)->orderBy('商品月销量', 'desc')->get()->toArray();
         //销量优先原则
         return $this->transmitText($xmlObj, $couponArr);
     }
@@ -32,11 +32,12 @@ class CouponController extends Controller
 <PicUrl><![CDATA[%s]]></PicUrl>
 <Url><![CDATA[%s]]></Url>
 </item>';
-        $itemStr = '';
-        foreach ($arrayData as $item) {
-            $itemStr += sprintf($itemTpl, $item->,$item->,$item->,$item->);
-        }
 
+        $itemXMLArr = array();
+        foreach ($arrayData as $item) {
+            $itemXMLArr[] = sprintf($itemTpl, $item->Title,$item->Description,$item->PicUrl,'http://8xdmkh.natappfree.cc/view');
+        }
+        $itemXMLStr = implode('',$itemXMLArr);
         $textTpl = '<xml>
 <ToUserName><![CDATA[%s]]></ToUserName>
 <FromUserName><![CDATA[%s]]></FromUserName>
@@ -48,7 +49,7 @@ class CouponController extends Controller
         $fromUserName = $object->FromUserName;
         $toUserName = $object->ToUserName;
         $time = $object->CreateTime;
-        $resultStr = sprintf($textTpl, $fromUserName, $toUserName, $time, count($arrayData), $itemStr);
+        $resultStr = sprintf($textTpl, $fromUserName, $toUserName, $time, count($arrayData), $itemXMLStr);
         return $resultStr;
     }
 }

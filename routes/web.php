@@ -26,3 +26,12 @@ $router->group(['namespace' => 'Api', 'middleware' => ['CheckSignatureMiddleware
     ]);
 
 });
+
+$router->group(['namespace' => 'View', 'middleware' => [], 'prefix' => ''], function () use ($router) {
+    //匹配view、view/、view/id
+    //很奇怪这种模式下不能把view写到prefix里
+    $router->get('view[/{id}]', [
+        'as' => 'CouponPage', 'uses' => 'CouponPageController@index'
+    ]);
+
+});
