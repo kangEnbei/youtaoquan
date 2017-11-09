@@ -7,26 +7,25 @@ use Illuminate\Http\Request;
 
 class CouponPageController extends Controller
 {
-    public function list(Request $request, $id=4)
+    public function couponList(Request $request, $id = 4)
     {
-//        if (view()->exists('Coupon.list')) {
-//            return view('Coupon.list', ['list' => %list]);
-//        }
-        return view('Coupon.list');
-//
-        echo $this->transmitHTML($id);
+        //记得给每个商品的链接上加上公众号ID
+        $list = null;
+        if (view()->exists('Coupon.list')) {
+            return view('Coupon.list', ['list' => $list]);
+        }
     }
 
-    public function item(Request $request, $id=4)
+    public function couponItem(Request $request, $id = 4)
     {
-//        if (view()->exists('Coupon.list')) {
-//            return view('Coupon.list', ['list' => %list]);
-//        }
-        return view('Coupon.list');
-//
-        echo $this->transmitHTML($id);
+        //记得给每个商品的链接上加上公众号ID
+        $item = null;
+        if (view()->exists('Coupon.item')) {
+            return view('Coupon.item', ['item' => $item]);
+        }
     }
 
+    //不要删，有复制代码
     private function transmitHTML($id)
     {
         $template = '<html>

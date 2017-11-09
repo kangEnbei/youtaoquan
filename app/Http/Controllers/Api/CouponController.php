@@ -20,24 +20,24 @@ class CouponController extends Controller
         //Redis复制量选最高的2个，取出商品ID，然后去优惠券仓库Redis里读取，没有就跳过
         //Redis点击量选最高的1个，取出商品ID，然后去优惠券仓库Redis里读取，没有就跳过
         //优惠券仓库Redis里随机选出5个
-        $redis = new \Redis();
-        if ($redis->connect(config('redis.CouponWarehouse.host', '127.0.0.1'), intval(config('redis.CouponWarehouse.port', 6379))) === true) {
-            //默认选择db0，下标从0开始，可读取配置
-            if ($redis->select(intval(config('redis.CouponWarehouse.dbindex', 0))) === true) {
-                if ($redis->hExists('classMap', $object->Content)) {
-                    $classInfo = (array)(unserialize($redis->hGet('classMap', $object->Content)));
-                    if (!empty($classInfo['class']) && !empty($classInfo['method'])) {
-                        $redis->close();
-//                        $controller = new $classInfo['class']();
-//                        //下面这一步不能执行，怎么解决
-//                        return $controller->$classInfo['method']($object);
-                        return call_user_func(array(new $classInfo['class'](), $classInfo['method']),$object);
-//                        return call_user_func(array($classInfo['class'], $classInfo['method']),$object);
-                    }
-                }
-            }
-            $redis->close();
-        }
+//        $redis = new \Redis();
+//        if ($redis->connect(config('redis.CouponWarehouse.host', '127.0.0.1'), intval(config('redis.CouponWarehouse.port', 6379))) === true) {
+//            //默认选择db0，下标从0开始，可读取配置
+//            if ($redis->select(intval(config('redis.CouponWarehouse.dbindex', 0))) === true) {
+//                if ($redis->hExists('classMap', $object->Content)) {
+//                    $classInfo = (array)(unserialize($redis->hGet('classMap', $object->Content)));
+//                    if (!empty($classInfo['class']) && !empty($classInfo['method'])) {
+//                        $redis->close();
+////                        $controller = new $classInfo['class']();
+////                        //下面这一步不能执行，怎么解决
+////                        return $controller->$classInfo['method']($object);
+//                        return call_user_func(array(new $classInfo['class'](), $classInfo['method']), $object);
+////                        return call_user_func(array($classInfo['class'], $classInfo['method']),$object);
+//                    }
+//                }
+//            }
+//            $redis->close();
+//        }
 
         //根据ToUserName读表选8条数据组装成XML并返回图文消息
         $tableName = $xmlObj->ToUserName;
@@ -58,9 +58,9 @@ class CouponController extends Controller
 
         $itemXMLArr = array();
         foreach ($arrayData as $item) {
-            $itemXMLArr[] = sprintf($itemTpl, $item->Title,$item->Description,$item->PicUrl,'http://8xdmkh.natappfree.cc/view');
+            $itemXMLArr[] = sprintf($itemTpl, $item->Title, $item->Description, $item->PicUrl, 'http://8xdmkh.natappfree.cc/view/list/502231231?gzh=gh_1q2w3e4r');
         }
-        $itemXMLStr = implode('',$itemXMLArr);
+        $itemXMLStr = implode('', $itemXMLArr);
         $textTpl = '<xml>
 <ToUserName><![CDATA[%s]]></ToUserName>
 <FromUserName><![CDATA[%s]]></FromUserName>
