@@ -7,8 +7,23 @@ use Illuminate\Http\Request;
 
 class CouponPageController extends Controller
 {
-    public function index(Request $request, $id=4)
+    public function list(Request $request, $id=4)
     {
+//        if (view()->exists('Coupon.list')) {
+//            return view('Coupon.list', ['list' => %list]);
+//        }
+        return view('Coupon.list');
+//
+        echo $this->transmitHTML($id);
+    }
+
+    public function item(Request $request, $id=4)
+    {
+//        if (view()->exists('Coupon.list')) {
+//            return view('Coupon.list', ['list' => %list]);
+//        }
+        return view('Coupon.list');
+//
         echo $this->transmitHTML($id);
     }
 
