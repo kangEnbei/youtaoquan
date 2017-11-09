@@ -45,4 +45,13 @@ return [
         'expire' => 604800,//7d
         'chunkSize' => 1048576,//1024*1024=1M，与优惠券仓库保持一致
     ],
+    //公众号仓库
+    //hash
+    'GZHWarehouse' => [
+        'host' => '127.0.0.1',
+        'port' => 6379,
+        'dbindex' => 5,
+        'expire' => 604800,//7d
+        'chunkSize' => 128,//128
+    ],
 ];
