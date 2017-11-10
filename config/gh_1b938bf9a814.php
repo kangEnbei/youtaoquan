@@ -7,4 +7,5 @@ return [
     'ID' => 'gh_1b938bf9a814',//原始ID
     'Token' => 'youtaoquan',
     'Name' => '有淘券',
+    'ArticleCount' => 6,
 ];

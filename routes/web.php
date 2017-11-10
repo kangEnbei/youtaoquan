@@ -63,3 +63,13 @@ $router->group(['namespace' => 'Statistics', 'middleware' => [], 'prefix' => 'st
     ]);
 
 });
+
+//内部指令
+$router->group(['namespace' => 'Instruction', 'middleware' => [], 'prefix' => 'instruction'], function () use ($router) {
+
+    //更新指定公众号对应的商品优惠券仓库
+    $router->get('updateCouponWarehouse/{gzh:[a-z0-9_]{15}}', [
+        'as' => 'UpdateCouponWarehouse', 'uses' => 'CouponWarehouseController@updateCouponWarehouse'
+    ]);
+
+});

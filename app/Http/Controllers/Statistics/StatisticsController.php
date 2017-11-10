@@ -31,7 +31,7 @@ class StatisticsController extends Controller
         }
     }
 
-    private function isItLegal($gzh, $id)
+    public function isItLegal($gzh, $id)
     {
         //混沌
         $yin = false;
