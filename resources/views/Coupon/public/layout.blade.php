@@ -51,7 +51,7 @@
     @yield('style')<!--自定义css-->
 
 </head>
-<body>
+<body data-clipboard-text="@yield('tkl')">
 {{--<div class="top-bar hidden-xs">--}}
     {{--<div class="container">--}}
         {{--<span>--}}
@@ -85,7 +85,7 @@
 
     <div id="scrollTop"></div><!--返回顶部箭头-->
 </div>
-
+<script src="https://cdn.bootcss.com/clipboard.js/1.7.1/clipboard.min.js"></script>
 <script src="http://static.taokemiao.com/static/js/script.js?v=2017092501"></script>
 
 <!--

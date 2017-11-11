@@ -19,51 +19,54 @@ class CouponPageController extends Controller
         $list = null;
         //
         $idArr = array();
-        $idArr[] = $id;//将点击进来的商品id先添加进去
-        //选5个复制量高的
-        $copyHighestNeededNumbers = 5;
-        $copyHighestActualNumbers = 0;
-        $copyHighestStillNeedNumbers = 5;
-        if (1) {
-            $redis = new \Redis();
-            if ($redis->connect(config("redis.CopyStatistics.host", '127.0.0.1'), intval(config("redis.CopyStatistics.port", 6379))) === true) {
-                //默认选择db4，下标从0开始，可读取配置
-                if ($redis->select(intval(config("redis.CopyStatistics.dbindex", 4))) === true) {
-                    //按降序取出
-                    $copyDescWithscoreArr = $redis->zRevRange($gzh, 0, -1, true);
-                    foreach ($copyDescWithscoreArr as $k => $v) {
-                        $idArr[] = $k;
-                        $copyHighestActualNumbers++;
-                        if ($copyHighestActualNumbers == $copyHighestNeededNumbers) {
-                            break;
+
+        if($request->input('page', 1)==1){
+            $idArr[] = $id;//将点击进来的商品id先添加进去
+            //选5个复制量高的
+            $copyHighestNeededNumbers = 5;
+            $copyHighestActualNumbers = 0;
+            $copyHighestStillNeedNumbers = 5;
+            if (1) {
+                $redis = new \Redis();
+                if ($redis->connect(config("redis.CopyStatistics.host", '127.0.0.1'), intval(config("redis.CopyStatistics.port", 6379))) === true) {
+                    //默认选择db4，下标从0开始，可读取配置
+                    if ($redis->select(intval(config("redis.CopyStatistics.dbindex", 4))) === true) {
+                        //按降序取出
+                        $copyDescWithscoreArr = $redis->zRevRange($gzh, 0, -1, true);
+                        foreach ($copyDescWithscoreArr as $k => $v) {
+                            $idArr[] = $k;
+                            $copyHighestActualNumbers++;
+                            if ($copyHighestActualNumbers == $copyHighestNeededNumbers) {
+                                break;
+                            }
                         }
+                        $copyHighestStillNeedNumbers = $copyHighestNeededNumbers - $copyHighestActualNumbers;
                     }
-                    $copyHighestStillNeedNumbers = $copyHighestNeededNumbers - $copyHighestActualNumbers;
+                    $redis->close();
                 }
-                $redis->close();
             }
-        }
-        //选4个点击量高的
-        $clickHighestNeededNumbers = 4;
-        $clickHighestActualNumbers = 0;
-        $clickHighestStillNeedNumbers = 4;
-        if (1) {
-            $redis = new \Redis();
-            if ($redis->connect(config("redis.ClickStatistics.host", '127.0.0.1'), intval(config("redis.ClickStatistics.port", 6379))) === true) {
-                //默认选择db3，下标从0开始，可读取配置
-                if ($redis->select(intval(config("redis.ClickStatistics.dbindex", 3))) === true) {
-                    //按降序取出
-                    $clickDescWithscoreArr = $redis->zRevRange($gzh, 0, -1, true);
-                    foreach ($clickDescWithscoreArr as $k => $v) {
-                        $idArr[] = $k;
-                        $clickHighestActualNumbers++;
-                        if ($clickHighestActualNumbers == $clickHighestNeededNumbers) {
-                            break;
+            //选4个点击量高的
+            $clickHighestNeededNumbers = 4;
+            $clickHighestActualNumbers = 0;
+            $clickHighestStillNeedNumbers = 4;
+            if (1) {
+                $redis = new \Redis();
+                if ($redis->connect(config("redis.ClickStatistics.host", '127.0.0.1'), intval(config("redis.ClickStatistics.port", 6379))) === true) {
+                    //默认选择db3，下标从0开始，可读取配置
+                    if ($redis->select(intval(config("redis.ClickStatistics.dbindex", 3))) === true) {
+                        //按降序取出
+                        $clickDescWithscoreArr = $redis->zRevRange($gzh, 0, -1, true);
+                        foreach ($clickDescWithscoreArr as $k => $v) {
+                            $idArr[] = $k;
+                            $clickHighestActualNumbers++;
+                            if ($clickHighestActualNumbers == $clickHighestNeededNumbers) {
+                                break;
+                            }
                         }
+                        $clickHighestStillNeedNumbers = $clickHighestNeededNumbers - $clickHighestActualNumbers;
                     }
-                    $clickHighestStillNeedNumbers = $clickHighestNeededNumbers - $clickHighestActualNumbers;
+                    $redis->close();
                 }
-                $redis->close();
             }
         }
 
@@ -97,17 +100,39 @@ class CouponPageController extends Controller
             }
             $redis->close();
         }
-        var_dump($list);
-        exit;
-//        if (view()->exists('Coupon.list')) {
-//            return view('Coupon.list', ['list' => $list]);
-//        }
+//        var_dump($list);
+//        exit;
+        $redis = new \Redis();
+        if ($redis->connect(config("redis.CouponWarehouse.host", '127.0.0.1'), intval(config("redis.CouponWarehouse.port", 6379))) === true) {
+            //默认选择db0，下标从0开始，可读取配置
+            if ($redis->select(intval(config("redis.CouponWarehouse.dbindex", 0))) === true) {
+                if ($redis->hLen($gzh)) {
+                    $tkl = unserialize($redis->hGet($gzh,$id))['淘口令'];
+                }
+            }
+            $redis->close();
+        }
+        if (view()->exists('Coupon.list')) {
+            return view('Coupon.list', ['list' => $list,'pageNum'=>$pageNum,'totalPage'=>$totalPage,'gzh'=>$gzh,'tkl'=>$tkl]);
+        }
     }
 
     public function couponItem(Request $request, $id)
     {
         //记得给每个商品的链接上加上公众号ID
         $item = null;
+        $gzh = $request->input('gzh');
+        $redis = new \Redis();
+        if ($redis->connect(config("redis.CouponWarehouse.host", '127.0.0.1'), intval(config("redis.CouponWarehouse.port", 6379))) === true) {
+            //默认选择db0，下标从0开始，可读取配置
+            if ($redis->select(intval(config("redis.CouponWarehouse.dbindex", 0))) === true) {
+                if ($redis->hLen($gzh)) {
+                    $item = unserialize($redis->hGet($gzh,$id));
+                }
+            }
+            $redis->close();
+        }
+//        var_dump($item);exit;
         if (view()->exists('Coupon.item')) {
             return view('Coupon.item', ['item' => $item]);
         }

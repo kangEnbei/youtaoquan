@@ -72,4 +72,9 @@ $router->group(['namespace' => 'Instruction', 'middleware' => [], 'prefix' => 'i
         'as' => 'UpdateCouponWarehouse', 'uses' => 'CouponWarehouseController@updateCouponWarehouse'
     ]);
 
+    //生成淘口令并存入数据库（太TM耗时了，一秒大概生成10个淘口令，10000个要1000秒）
+    $router->get('generateTkl/{gzh:[a-z0-9_]{15}}', [
+        'as' => 'GenerateTkl', 'uses' => 'CouponWarehouseController@generateTkl'
+    ]);
+
 });

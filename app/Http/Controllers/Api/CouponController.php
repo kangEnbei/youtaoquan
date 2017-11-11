@@ -47,7 +47,7 @@ class CouponController extends Controller
 
         $itemXMLArr = array();
         foreach ($arrayData as $item) {
-            $itemXMLArr[] = sprintf($itemTpl, $item['商品名称'], $item['优惠券面额'], $item['商品主图'], 'http://8xdmkh.natappfree.cc/view/list/'.$item['商品id'].'?gzh='.$object->ToUserName);
+            $itemXMLArr[] = sprintf($itemTpl, $item['商品名称'], $item['优惠券面额'], $item['商品主图'], 'http://dxeahm.natappfree.cc/view/list/'.$item['商品id'].'?gzh='.$object->ToUserName);
         }
         $itemXMLStr = implode('', $itemXMLArr);
         $textTpl = '<xml>

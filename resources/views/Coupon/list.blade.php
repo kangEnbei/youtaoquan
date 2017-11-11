@@ -5,63 +5,67 @@
 {{--@extends('Coupon.public.searchbar_navigation')--}}
 {{--@extends('Coupon.public.color_block_area')--}}
 {{--@extends('Coupon.public.condition_area')--}}
-
+@section('tkl')
+    {{$tkl}}
+@endsection
 @section('list')
     <div class="section-header">
         <div class="first">NEW</div>
         <div class="second">优惠券直播 (43464)</div>
     </div>
     <div class="goods-list">
+        @foreach ($list as $coupon)
+            <div class="goods">
+                <div class="content block">
 
-        <div class="goods">
-            <div class="content block">
+                    <a href="/view/item/{{$coupon['商品id']}}?gzh={{$gzh}}" target="_blank">
+                        <div class="pic">
+                            <img src="{{$coupon['商品主图']}}" class="lazy"
+                                 data-original="{{$coupon['商品主图']}}">
 
-                <a href="/detail/2138143" target="_blank">
-                    <div class="pic">
-                        <img src="http://static.taokemiao.com/static/images/waiting.png" class="lazy"
-                             data-original="http://gaitaobao2.alicdn.com/tfscom/i3/2844174382/TB2x0mGawvD8KJjSsplXXaIEFXa_!!2844174382.jpg_290x290.jpg">
+                        </div>
 
-                    </div>
+                        <div class="today"></div>
 
-                    <div class="today"></div>
+                    </a>
 
-                </a>
-                <div class="info">
+                    <div class="info">
 
-                    <div class="intro1">
+                        <div class="intro1">
 
-                        <span class="mall-ico taobao"></span>
+                            <span class="mall-ico taobao"></span>
 
-                        <a class="title" href="/detail/2138143" target="_blank">冬季甜美可爱珊瑚绒韩版清新学生</a>
-                    </div>
+                            <a class="title" href="/view/item/{{$coupon['商品id']}}?gzh={{$gzh}}" target="_blank">{{$coupon['商品名称']}}</a>
+                        </div>
 
-                    <div class="intro2">
-                        <span class="coupon">优惠券<span class="red">20.0</span>元<!--，剩余8000张--></span>
-                        <span class="sales"> 销量2549</span>
+                        <div class="intro2">
+                            <span class="coupon">优惠券<span class="red">{{$coupon['优惠券面额']}}</span><!--，剩余8000张--></span>
+                            <span class="sales"> 销量{{$coupon['商品月销量']}}</span>
 
-                    </div>
-                    <div class="intro3">
+                        </div>
+                        <div class="intro3">
                 <span class="price_discount red">¥ <span class="fee">
 
 
-                        39
+                        {{$coupon['商品价格(单位：元)']}}
 
 
                 </span></span>
                         <span class="price_original">¥79
 
                 </span>
-                        <div class="tk right">
+
+                            <div class="tk right">
                 <span class="campaign">
 
                 </span>
-                            <span class="commission red">佣金<span class="fee">30%</span></span>
+                                <span class="commission red"><span class="fee">{{$coupon['优惠券面额']}}</span></span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-
+        @endforeach
 
         <div style="clear:both"></div>
     </div>
@@ -121,6 +125,22 @@
         </ul>
 
     </div>
+
+    <script>
+        window.onload=function(){
+            var clipboard = new Clipboard("body");
+        }
+
+        function log(s){
+            document.getElementById("contid").innerHTML = s;
+            var clipboard = new Clipboard("body");
+        }
+
+        var eva = new zyEvent(document,'up',function(){log('向上滑动')});
+        var evb = new zyEvent(document,'down',function(){log('向下滑动')});
+        var evc = new zyEvent(document,'left',function(){log('向左滑动')});
+        var evd = new zyEvent(document,'right',function(){log('向右滑动')});
+    </script>
 @endsection
 
 {{--@extends('Coupon.public.footer')--}}
